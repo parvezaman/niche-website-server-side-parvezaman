@@ -48,7 +48,7 @@ async function run() {
 
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Hello World! the shop and shoot server has just started! Happy Browsing!!! X-D');
 })
 
 app.listen(port, () => {
