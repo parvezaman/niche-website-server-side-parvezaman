@@ -90,6 +90,7 @@ async function run() {
           },
         };
         const result = await ordersCollection.updateOne(query, updateDoc);
+        // console.log(result);
         res.json(result);
       })
 
