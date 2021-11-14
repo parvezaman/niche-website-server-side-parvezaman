@@ -24,12 +24,19 @@ async function run() {
       const haiku = database.collection("test");
       const productCollection = database.collection("productCollection");
       const purchaseInitCollection = database.collection("purchaseInitCollection");
+      const ordersCollection = database.collection("ordersCollection");
 
       // GET Products API
       app.get('/products', async(req, res)=>{
         const cursor = productCollection.find({});
         const products = await cursor.toArray();
         res.send(products);
+      });
+      // GET Orders API
+      app.get('/orders', async(req, res)=>{
+        const cursor = ordersCollection.find({});
+        const orders = await cursor.toArray();
+        res.send(orders);
       });
 
       // GET API (Get single product by id)
@@ -39,6 +46,16 @@ async function run() {
         const query = {_id: ObjectId(id)};
         const singleProduct = await productCollection.findOne(query);
         res.json(singleProduct);
+      });
+      
+
+      // POST API (Post Orders)
+      app.post('/orders', async(req, res)=>{
+        const order = req.body;
+        const status2 ={status:'pending'};
+        const userOrder ={...order, ...status2};
+        const result = await ordersCollection.insertOne(userOrder);
+        res.json(result);
       })
 
       // POST API (Proceed Order)
