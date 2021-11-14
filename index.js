@@ -80,6 +80,19 @@ async function run() {
         res.json(result);
       });
 
+      // UPDATE API (Update shipping info)
+      app.put('/orders/:id', async(req, res)=>{
+        const id = req.params.id;
+        const query = {_id: ObjectId(id)};
+        const updateDoc = {
+          $set: {
+            status: "Shipped"
+          },
+        };
+        const result = await ordersCollection.updateOne(query, updateDoc);
+        res.json(result);
+      })
+
       // DELETE API (Delete order from my orders)
       app.delete('/orders/:id', async(req, res)=>{
         const id = req.params.id;
