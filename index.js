@@ -3,6 +3,7 @@ const { MongoClient } = require('mongodb');
 const cors =require('cors');
 const app = express();
 require('dotenv').config();
+const ObjectId = require('mongodb').ObjectId;
 
 //PORT
 const port = process.env.PORT || 5000;
@@ -22,20 +23,38 @@ async function run() {
       const database = client.db("shop-and-shoot");
       const haiku = database.collection("test");
       const productCollection = database.collection("productCollection");
+      const purchaseInitCollection = database.collection("purchaseInitCollection");
 
       // GET Products API
       app.get('/products', async(req, res)=>{
         const cursor = productCollection.find({});
         const products = await cursor.toArray();
         res.send(products);
+      });
+
+      // GET API (Get single product by id)
+      app.get('/products/:id', async(req, res)=>{
+        const id = req.params.id;
+        console.log('getting a single product', id);
+        const query = {_id: ObjectId(id)};
+        const singleProduct = await productCollection.findOne(query);
+        res.json(singleProduct);
       })
-      // POST API
+
+      // POST API (Proceed Order)
+      app.post('/purchaseinit', async(req, res)=>{
+        const purchaseInit = req.body;
+        const result = await purchaseInitCollection.insertOne(purchaseInit);
+        res.json(result);
+      });
+
+      // POST API (Add new Product)
       app.post('/products', async(req, res)=>{
         const product = req.body;
         const result = await productCollection.insertOne(product);
         // console.log("hit the post");
         res.json(result);
-      })
+      });
 
 
       // const result = await haiku.insertOne(doc);
