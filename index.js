@@ -38,6 +38,13 @@ async function run() {
         const orders = await cursor.toArray();
         res.send(orders);
       });
+      // GET specific Orders API 
+      app.get('/orders/:id', async(req, res)=>{
+        const id = req.params.id;
+        const query = {_id: ObjectId(id)};
+        const singleOrder = await ordersCollection.findOne(query);
+        res.send(singleOrder);
+      });
 
       // GET API (Get single product by id)
       app.get('/products/:id', async(req, res)=>{
@@ -72,6 +79,15 @@ async function run() {
         // console.log("hit the post");
         res.json(result);
       });
+
+      // DELETE API (Delete order from my orders)
+      app.delete('/orders/:id', async(req, res)=>{
+        const id = req.params.id;
+        const query = {_id: ObjectId(id)};
+        const result = await ordersCollection.deleteOne(query);
+        console.log('deleting id', result)
+        res.json(result);
+      })
 
 
       // const result = await haiku.insertOne(doc);
