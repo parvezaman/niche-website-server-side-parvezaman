@@ -1,6 +1,6 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
-const cors =require('cors');
+const cors = require('cors');
 const app = express();
 require('dotenv').config();
 const ObjectId = require('mongodb').ObjectId;
@@ -18,99 +18,116 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 
 async function run() {
-    try {
-      await client.connect();
-      const database = client.db("shop-and-shoot");
-      const haiku = database.collection("test");
-      const productCollection = database.collection("productCollection");
-      const purchaseInitCollection = database.collection("purchaseInitCollection");
-      const ordersCollection = database.collection("ordersCollection");
+  try {
+    await client.connect();
+    const database = client.db("shop-and-shoot");
+    const haiku = database.collection("test");
+    const productCollection = database.collection("productCollection");
+    const purchaseInitCollection = database.collection("purchaseInitCollection");
+    const ordersCollection = database.collection("ordersCollection");
+    const usersCollection = database.collection("usersCollection");
 
-      // GET Products API
-      app.get('/products', async(req, res)=>{
-        const cursor = productCollection.find({});
-        const products = await cursor.toArray();
-        res.send(products);
-      });
-      // GET Orders API
-      app.get('/orders', async(req, res)=>{
-        const cursor = ordersCollection.find({});
-        const orders = await cursor.toArray();
-        res.send(orders);
-      });
-      // GET specific Orders API 
-      app.get('/orders/:id', async(req, res)=>{
-        const id = req.params.id;
-        const query = {_id: ObjectId(id)};
-        const singleOrder = await ordersCollection.findOne(query);
-        res.send(singleOrder);
-      });
+    // GET Products API
+    app.get('/products', async (req, res) => {
+      const cursor = productCollection.find({});
+      const products = await cursor.toArray();
+      res.send(products);
+    });
+    // GET Orders API
+    app.get('/orders', async (req, res) => {
+      const cursor = ordersCollection.find({});
+      const orders = await cursor.toArray();
+      res.send(orders);
+    });
+    // GET specific Orders API 
+    app.get('/orders/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const singleOrder = await ordersCollection.findOne(query);
+      res.send(singleOrder);
+    });
 
-      // GET API (Get single product by id)
-      app.get('/products/:id', async(req, res)=>{
-        const id = req.params.id;
-        console.log('getting a single product', id);
-        const query = {_id: ObjectId(id)};
-        const singleProduct = await productCollection.findOne(query);
-        res.json(singleProduct);
-      });
-      
+    // GET API (Get single product by id)
+    app.get('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log('getting a single product', id);
+      const query = { _id: ObjectId(id) };
+      const singleProduct = await productCollection.findOne(query);
+      res.json(singleProduct);
+    });
 
-      // POST API (Post Orders)
-      app.post('/orders', async(req, res)=>{
-        const order = req.body;
-        const status2 ={status:'pending'};
-        const userOrder ={...order, ...status2};
-        const result = await ordersCollection.insertOne(userOrder);
-        res.json(result);
-      })
+    // POST API (Post users info email password regestration)
+    app.post('/users', async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      res.json(result);
+    })
 
-      // POST API (Proceed Order)
-      app.post('/purchaseinit', async(req, res)=>{
-        const purchaseInit = req.body;
-        const result = await purchaseInitCollection.insertOne(purchaseInit);
-        res.json(result);
-      });
+    // PUT API ( upsert userinfo for Google login)
+    app.put('/users', async (req, res) => {
+      const user = req.body;
+      const filter ={email : user.email};
+      const option = {upsert:true};
+      const updateDoc = {$set: user};
+      const result = await usersCollection.updateOne(filter, updateDoc, option);
+      res.json(result);
+    })
 
-      // POST API (Add new Product)
-      app.post('/products', async(req, res)=>{
-        const product = req.body;
-        const result = await productCollection.insertOne(product);
-        // console.log("hit the post");
-        res.json(result);
-      });
+    // POST API (Post Orders)
+    app.post('/orders', async (req, res) => {
+      const order = req.body;
+      const status2 = { status: 'pending' };
+      const userOrder = { ...order, ...status2 };
+      const result = await ordersCollection.insertOne(userOrder);
+      res.json(result);
+    })
 
-      // UPDATE API (Update shipping info)
-      app.put('/orders/:id', async(req, res)=>{
-        const id = req.params.id;
-        const query = {_id: ObjectId(id)};
-        const updateDoc = {
-          $set: {
-            status: "Shipped"
-          },
-        };
-        const result = await ordersCollection.updateOne(query, updateDoc);
-        // console.log(result);
-        res.json(result);
-      })
+    // POST API (Proceed Order)
+    app.post('/purchaseinit', async (req, res) => {
+      const purchaseInit = req.body;
+      const result = await purchaseInitCollection.insertOne(purchaseInit);
+      res.json(result);
+    });
 
-      // DELETE API (Delete order from my orders)
-      app.delete('/orders/:id', async(req, res)=>{
-        const id = req.params.id;
-        const query = {_id: ObjectId(id)};
-        const result = await ordersCollection.deleteOne(query);
-        console.log('deleting id', result)
-        res.json(result);
-      })
+    // POST API (Add new Product)
+    app.post('/products', async (req, res) => {
+      const product = req.body;
+      const result = await productCollection.insertOne(product);
+      // console.log("hit the post");
+      res.json(result);
+    });
+
+    // UPDATE API (Update shipping info)
+    app.put('/orders/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          status: "Shipped"
+        },
+      };
+      const result = await ordersCollection.updateOne(query, updateDoc);
+      // console.log(result);
+      res.json(result);
+    })
+
+    // DELETE API (Delete order from my orders)
+    app.delete('/orders/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await ordersCollection.deleteOne(query);
+      console.log('deleting id', result)
+      res.json(result);
+    })
 
 
-      // const result = await haiku.insertOne(doc);
-      // console.log(`A document was inserted with the _id: ${result.insertedId}`);
-    } finally {
+    // const result = await haiku.insertOne(doc);
+    // console.log(`A document was inserted with the _id: ${result.insertedId}`);
+  } finally {
     //   await client.close();
-    }
   }
-  run().catch(console.dir);
+}
+run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
