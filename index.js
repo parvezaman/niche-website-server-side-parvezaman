@@ -62,6 +62,19 @@ async function run() {
       res.json(singleProduct);
     });
 
+
+    // GET API (Check whether admin or not)
+    app.get('/users/:email', async(req, res)=>{
+      const email = req.params.email;
+      const query = {email : email};
+      const user = await usersCollection.findOne(query);
+      let isAdmin = false;
+      if(user?.role === 'admin'){
+        isAdmin = true;
+      }
+      res.json({admin: isAdmin});
+    })
+
     // POST API (Post users info email password regestration)
     app.post('/users', async (req, res) => {
       const user = req.body;
