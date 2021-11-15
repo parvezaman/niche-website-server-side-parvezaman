@@ -169,7 +169,16 @@ async function run() {
       const result = await ordersCollection.deleteOne(query);
       console.log('deleting id', result)
       res.json(result);
-    })
+    });
+
+    // DELETE API (Delete product from my products)
+    app.delete('/products/:id', async (req, res) => {
+      let id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await productCollection.deleteOne(query);
+      console.log('deleting id', result)
+      res.json(result);
+    });
 
 
     // const result = await haiku.insertOne(doc);
