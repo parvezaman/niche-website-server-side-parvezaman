@@ -26,6 +26,8 @@ async function run() {
     const purchaseInitCollection = database.collection("purchaseInitCollection");
     const ordersCollection = database.collection("ordersCollection");
     const usersCollection = database.collection("usersCollection");
+    const reviewCollection = database.collection("reviewCollection");
+    const accessoriesCollection = database.collection("accessoriesCollection");
 
     // GET Products API
     app.get('/products', async (req, res) => {
@@ -33,6 +35,13 @@ async function run() {
       const products = await cursor.toArray();
       res.send(products);
     });
+    // GET Accessories API
+    app.get('/accessories', async (req, res) => {
+      const cursor = accessoriesCollection.find({});
+      const accessory = await cursor.toArray();
+      res.send(accessory);
+    });
+    
     // GET all users API
     app.get('/users', async (req, res) => {
       const cursor = usersCollection.find({});
@@ -115,6 +124,20 @@ async function run() {
       const purchaseInit = req.body;
       const result = await purchaseInitCollection.insertOne(purchaseInit);
       res.json(result);
+    });
+
+    // POST Review API
+    app.post('/reviews', async (req, res)=>{
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.json(result);
+    });
+
+    // GET Review API
+    app.get('/reviews', async (req, res) => {
+      const cursor = reviewCollection.find({});
+      const reviews = await cursor.toArray();
+      res.send(reviews);
     });
 
     // POST API (Add new Product)
