@@ -35,7 +35,7 @@ async function run() {
       const products = await cursor.toArray();
       res.send(products);
     });
-    // GET Accessories API
+    // GET Accessories API for home page
     app.get('/accessories', async (req, res) => {
       const cursor = accessoriesCollection.find({});
       const accessory = await cursor.toArray();
