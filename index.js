@@ -33,6 +33,12 @@ async function run() {
       const products = await cursor.toArray();
       res.send(products);
     });
+    // GET all users API
+    app.get('/users', async (req, res) => {
+      const cursor = usersCollection.find({});
+      const users = await cursor.toArray();
+      res.send(users);
+    });
     // GET Orders API
     app.get('/orders', async (req, res) => {
       const cursor = ordersCollection.find({});
@@ -70,6 +76,15 @@ async function run() {
       const option = {upsert:true};
       const updateDoc = {$set: user};
       const result = await usersCollection.updateOne(filter, updateDoc, option);
+      res.json(result);
+    })
+
+    // PUT API (add role to Make an admin)
+    app.put('/users/admin', async(req, res)=>{
+      const user = req.body;
+      const filter = {email : user.email};
+      const updateDoc ={$set:{role: 'admin'}};
+      const result = await usersCollection.updateOne(filter, updateDoc);
       res.json(result);
     })
 
